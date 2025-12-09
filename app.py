@@ -1,5 +1,5 @@
 # ==============================================================
-# app.py — Mechatronics Power BI Edition (Visuals v3.7 - Final Polish)
+# app.py — Mechatronics Power BI Edition (Visuals v4.0 - Final Fix)
 # ==============================================================
 
 import streamlit as st
@@ -15,12 +15,12 @@ st.set_page_config(
     page_title="Mechatronics BI", 
     page_icon="📊", 
     layout="wide",
-    initial_sidebar_state="expanded" # Sidebar ALWAYS visible
+    initial_sidebar_state="expanded" # UPDATED: Fixed Sidebar (Always Show)
 )
 
 # 2. LOAD CSS
 def load_css():
-    css_path = Path(__file__).parent / "style.css"
+    css_path = Path(__file__).parent / "assets" / "style.css"
     if css_path.exists():
         st.markdown(f"<style>{css_path.read_text()}</style>", unsafe_allow_html=True)
     else:
@@ -59,10 +59,10 @@ st.sidebar.markdown("---")
 page = st.sidebar.radio("Navigate", ["Inventory Overview", "Delivery Tracking", "Project Explorer"])
 
 # ------------------------------------------------------------
-# 4. DATA ENGINE (v8 - Final Clean)
+# 4. DATA ENGINE (v9 - Strict Merge Fix)
 # ------------------------------------------------------------
 @st.cache_data
-def load_data_v8():
+def load_data_v9():
     file_path = "Mechatronics Project Parts_Data.xlsx"
     if not Path(file_path).exists(): return None, None, None
 
@@ -89,31 +89,31 @@ def load_data_v8():
         def clean(df):
             if df.empty: return df
             
-            # Identify ID columns to force UPPERCASE for matching
+            # Identify ID columns (e.g. MfgNo) vs Normal Text
             id_cols = [c for c in df.columns if any(x in c.lower() for x in ['no', 'id', 'code', 'mfg'])]
 
             for col in df.columns:
                 if "link" in col.lower(): continue 
                 
-                # 1. Force String & Strip
+                # 1. Force String & Strip Whitespace
                 s = df[col].astype(str).str.strip()
                 
                 # 2. Fix Float Strings (Global fix: "2095.0" -> "2095")
                 s = s.str.replace(r'\.0$', '', regex=True)
                 
-                # 3. Replace Junk with clean dash (Visual Fix)
-                # This ensures "nan", "None", etc become "-" instead of "Undefined"
+                # 3. Replace "Nan", "None", "Unknown" with clean dash "-"
+                # This ensures we don't see "undefined" text on screen
                 s = s.replace(r'(?i)^(nan|none|unknown|undefined|null|nat)$', '-', regex=True)
                 
-                # 4. Case Standardization
+                # 4. Standardize Case
                 if col in id_cols:
-                    s = s.str.upper() # IDs -> UPPERCASE
+                    s = s.str.upper() # IDs -> UPPERCASE for matching
                 else:
-                    s = s.str.title() # Text -> Title Case
+                    s = s.str.title() # Text -> Title Case for display
                 
                 df[col] = s
             
-            # 5. Brand Standardization
+            # 5. Brand Names Standardization
             brand_map = {
                 "DFROBOT": "DFRobot", "DFR": "DFRobot", "ADAFRUIT": "Adafruit", 
                 "POLOLU": "Pololu", "SPARKFUN": "SparkFun", "ARDUINO": "Arduino", 
@@ -131,7 +131,7 @@ def load_data_v8():
         st.error(f"Data Load Error: {e}")
         return None, None, None
 
-df_components, df_sets, df_projects = load_data_v8()
+df_components, df_sets, df_projects = load_data_v9()
 
 if df_components is None:
     st.error("❌ File not found. Please upload 'Mechatronics Project Parts_Data.xlsx'")
@@ -360,15 +360,19 @@ elif page == "Project Explorer":
         proj_row = df_projects[df_projects[p_name_col] == selected_proj]
         bom = proj_row.melt(id_vars=[p_name_col], value_vars=comp_cols, value_name="MfgNo").dropna()
         
-        # KEY FIX: The main cleaning function ALREADY upper-cased everything in df_proj
-        # So we just need to ensure we don't have junk
+        # KEY FIX: Ensure all keys are strings, uppercase, and stripped of decimals
+        # This matches the logic in load_data_v9
+        bom["MfgNo"] = bom["MfgNo"].astype(str).str.strip().str.upper()
+        bom["MfgNo"] = bom["MfgNo"].str.replace(r'\.0$', '', regex=True)
+        
+        # Filter junk after cleaning
         bom = bom[bom["MfgNo"].str.len() > 1]
         bom = bom[~bom["MfgNo"].isin(["-", "UNKNOWN", "NAN", "NONE"])]
         
         c_mfg_no = get_col(df_components, ["MfgNo", "Mfg No", "PartNo", "Part Number"])
         
         if c_mfg_no:
-            # df_components is ALSO already upper-cased by load_data_v8
+            # Main inventory is already cleaned/uppercased by load_data_v9
             df_bom = pd.merge(bom, df_components, left_on="MfgNo", right_on=c_mfg_no, how="left")
             
             # FILL REMAINING GAPS WITH DASH (Clean Look)
@@ -428,7 +432,4 @@ elif page == "Project Explorer":
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.error("Could not link Project Data to Inventory. 'MfgNo' column missing in Inventory.")
-
     else: st.info("👆 Please select a project above to see its components.")
-
-
