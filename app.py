@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="Mechatronics BI", 
     page_icon="📊", 
     layout="wide",
-    initial_sidebar_state="collapsed" # Sidebar collapsed by default
+    initial_sidebar_state="expanded" # Sidebar ALWAYS visible
 )
 
 # 2. LOAD CSS
@@ -430,3 +430,4 @@ elif page == "Project Explorer":
             st.error("Could not link Project Data to Inventory. 'MfgNo' column missing in Inventory.")
 
     else: st.info("👆 Please select a project above to see its components.")
+
