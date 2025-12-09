@@ -431,3 +431,4 @@ elif page == "Project Explorer":
 
     else: st.info("👆 Please select a project above to see its components.")
 
+
