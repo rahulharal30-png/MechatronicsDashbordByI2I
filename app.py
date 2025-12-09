@@ -1,5 +1,5 @@
 # ==============================================================
-# app.py — Mechatronics Power BI Edition (Visuals v4.0 - Final Fix)
+# app.py — Mechatronics Power BI Edition (System v5.5 - Stylish Header)
 # ==============================================================
 
 import streamlit as st
@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="Mechatronics BI", 
     page_icon="📊", 
     layout="wide",
-    initial_sidebar_state="expanded" # UPDATED: Fixed Sidebar (Always Show)
+    initial_sidebar_state="expanded" 
 )
 
 # 2. LOAD CSS
@@ -47,22 +47,47 @@ def theme_plotly(fig, height=300):
     return fig
 
 # ------------------------------------------------------------
-# 3. SIDEBAR
+# 3. NAVIGATION ( COMPACT & ATTRACTIVE HEADER )
 # ------------------------------------------------------------
+# A. SIDEBAR NAV (Standard)
 st.sidebar.title("📦 Mechatronics")
-
-if st.sidebar.button("🔥 Clear Cache & Reload", type="primary"):
+if st.sidebar.button("🔥 Reset", type="primary"):
     st.cache_data.clear()
     st.rerun()
-
 st.sidebar.markdown("---")
-page = st.sidebar.radio("Navigate", ["Inventory Overview", "Delivery Tracking", "Project Explorer"])
+page_side = st.sidebar.radio("Navigate (Sidebar)", ["Inventory Overview", "Delivery Tracking", "Project Explorer"], key="nav_side")
+
+# B. MAIN HEADER NAV (Single Row, Stylish)
+# Use a container to group the header elements cleanly
+with st.container():
+    # Columns: Title (Left), Nav (Center-Right), Actions (Right)
+    c1, c2, c3 = st.columns([2, 3, 1], gap="small")
+    
+    with c1:
+        # Title and Sidebar Toggle in one visual block
+        st.subheader("📊 Mechatronics BI")
+        # Optional: A tiny caption or breadcrumb
+        # st.caption(f"Last updated: {datetime.datetime.now().strftime('%H:%M')}")
+
+    with c2:
+        # Navigation in the middle, using "pills" style if available or horizontal radio
+        # Using a selectbox can sometimes be cleaner for mobile, but radio horizontal is good for desktop
+        page_main = st.radio("Go to:", ["Inventory Overview", "Delivery Tracking", "Project Explorer"], 
+                             horizontal=True, label_visibility="collapsed", key="nav_main")
+
+    with c3:
+             if st.button("↻", help="Reload Data"):
+                 st.cache_data.clear()
+                 st.rerun()
+
+# LOGIC: Sync Main Nav
+page = page_main 
 
 # ------------------------------------------------------------
-# 4. DATA ENGINE (v9 - Strict Merge Fix)
+# 4. DATA ENGINE (v10 - Deep Cleaning & Normalization)
 # ------------------------------------------------------------
 @st.cache_data
-def load_data_v9():
+def load_data_v10():
     file_path = "Mechatronics Project Parts_Data.xlsx"
     if not Path(file_path).exists(): return None, None, None
 
@@ -85,35 +110,42 @@ def load_data_v9():
             if not df.empty:
                 df.columns = [c.strip() for c in df.columns]
 
-        # --- SMART CLEANER ---
+        # --- DEEP CLEANER FUNCTION ---
         def clean(df):
             if df.empty: return df
             
-            # Identify ID columns (e.g. MfgNo) vs Normal Text
-            id_cols = [c for c in df.columns if any(x in c.lower() for x in ['no', 'id', 'code', 'mfg'])]
+            # Helper to normalize ID strings (remove non-alphanumeric for matching)
+            def normalize_id(val):
+                s = str(val).strip().upper()
+                if s.endswith('.0'): s = s[:-2] # Fix floats
+                return s
 
             for col in df.columns:
-                if "link" in col.lower(): continue 
+                # Skip Links
+                if "link" in col.lower(): continue
                 
-                # 1. Force String & Strip Whitespace
-                s = df[col].astype(str).str.strip()
+                # 1. Base conversion
+                df[col] = df[col].astype(str).str.strip()
                 
-                # 2. Fix Float Strings (Global fix: "2095.0" -> "2095")
-                s = s.str.replace(r'\.0$', '', regex=True)
+                # 2. Fix Float Strings (Global)
+                df[col] = df[col].str.replace(r'\.0$', '', regex=True)
                 
-                # 3. Replace "Nan", "None", "Unknown" with clean dash "-"
-                # This ensures we don't see "undefined" text on screen
-                s = s.replace(r'(?i)^(nan|none|unknown|undefined|null|nat)$', '-', regex=True)
+                # 3. Replace Junk with clean dash
+                df[col] = df[col].replace(
+                    r'(?i)^(nan|none|unknown|undefined|null|nat|0)$', 
+                    '-', 
+                    regex=True
+                )
                 
                 # 4. Standardize Case
-                if col in id_cols:
-                    s = s.str.upper() # IDs -> UPPERCASE for matching
+                # If column looks like an ID/Code, make it UPPERCASE for matching
+                # Otherwise Title Case for readability
+                if any(x in col.lower() for x in ['no', 'id', 'code', 'mfg']):
+                    df[col] = df[col].str.upper()
                 else:
-                    s = s.str.title() # Text -> Title Case for display
-                
-                df[col] = s
-            
-            # 5. Brand Names Standardization
+                    df[col] = df[col].str.title()
+
+            # 5. Brand Standardization
             brand_map = {
                 "DFROBOT": "DFRobot", "DFR": "DFRobot", "ADAFRUIT": "Adafruit", 
                 "POLOLU": "Pololu", "SPARKFUN": "SparkFun", "ARDUINO": "Arduino", 
@@ -131,13 +163,14 @@ def load_data_v9():
         st.error(f"Data Load Error: {e}")
         return None, None, None
 
-df_components, df_sets, df_projects = load_data_v9()
+df_components, df_sets, df_projects = load_data_v10()
 
 if df_components is None:
     st.error("❌ File not found. Please upload 'Mechatronics Project Parts_Data.xlsx'")
     st.stop()
 else:
-    st.sidebar.caption(f"DB Connected: {datetime.datetime.now().strftime('%H:%M')}")
+    # Diagnostic Timestamp
+    st.sidebar.caption(f"System Ready: {datetime.datetime.now().strftime('%H:%M:%S')}")
 
 # --- HELPERS ---
 def get_col(df, candidates):
@@ -174,20 +207,28 @@ if page == "Inventory Overview":
     c_link = get_col(df_components, ["Link", "Url"])
 
     st.sidebar.header("🔍 Filters")
-    df_filtered = df_components.copy()
-    filters_active = False
+    # Duplicate filter in main expander for accessibility
+    with st.expander("🔍 Filter Options", expanded=False):
+        c_f1, c_f2 = st.columns(2)
+        df_filtered = df_components.copy()
+        filters_active = False
 
-    if c_status:
-        opts = sorted(list(df_components[c_status].unique()))
-        sel_stat = st.sidebar.multiselect("Status", opts, default=opts)
-        if len(sel_stat) < len(opts): filters_active = True
-        if sel_stat: df_filtered = df_filtered[df_filtered[c_status].isin(sel_stat)]
+        sel_stat = []
+        sel_cat = []
         
-    if c_cat:
-        opts = sorted(list(df_components[c_cat].unique()))
-        sel_cat = st.sidebar.multiselect("Category", opts, default=opts)
-        if len(sel_cat) < len(opts): filters_active = True
-        if sel_cat: df_filtered = df_filtered[df_filtered[c_cat].isin(sel_cat)]
+        if c_status:
+            opts = sorted(list(df_components[c_status].unique()))
+            with c_f1:
+                sel_stat = st.multiselect("Status", opts, default=opts, key="main_stat")
+            if len(sel_stat) < len(opts): filters_active = True
+            if sel_stat: df_filtered = df_filtered[df_filtered[c_status].isin(sel_stat)]
+            
+        if c_cat:
+            opts = sorted(list(df_components[c_cat].unique()))
+            with c_f2:
+                sel_cat = st.multiselect("Category", opts, default=opts, key="main_cat")
+            if len(sel_cat) < len(opts): filters_active = True
+            if sel_cat: df_filtered = df_filtered[df_filtered[c_cat].isin(sel_cat)]
 
     c_title, c_search = st.columns([1, 1])
     with c_title: st.markdown("## 🏭 Inventory Cockpit")
@@ -195,7 +236,9 @@ if page == "Inventory Overview":
         search_inv = st.text_input("Search", placeholder="Search Mfg No, Name, or Brand...", label_visibility="collapsed")
         if search_inv:
             search_term = search_inv.strip()
-            mask = df_filtered.astype(str).apply(lambda x: x.str.contains(search_term, case=False)).any(axis=1)
+            # Searching against Uppercased columns
+            search_targets = [c for c in [c_mfg_no, c_name, c_brand] if c]
+            mask = df_filtered[search_targets].astype(str).apply(lambda x: x.str.contains(search_term, case=False)).any(axis=1)
             df_filtered = df_filtered[mask]
             filters_active = True 
 
@@ -244,6 +287,7 @@ if page == "Inventory Overview":
     st.markdown('<div class="card-container"><div class="chart-title">Data Explorer (Sunburst)</div>', unsafe_allow_html=True)
     if c_cat and c_sub1 and not df_filtered.empty:
         df_sun = df_filtered.copy()
+        # Ensure we don't map "undefined" or "-" here, use "General" for better UX
         df_sun[c_cat] = df_sun[c_cat].replace("-", "Unknown") 
         path = [c_cat, c_sub1]
         if c_sub2 and df_sun[c_sub2].notna().any():
@@ -339,7 +383,7 @@ elif page == "Delivery Tracking":
     else: st.caption("👇 *Select a Set or Search to view individual line items.*")
 
 # ------------------------------------------------------------
-# DASHBOARD 3: PROJECT EXPLORER (With Strict Type Fixes)
+# DASHBOARD 3: PROJECT EXPLORER
 # ------------------------------------------------------------
 elif page == "Project Explorer":
     
@@ -360,22 +404,22 @@ elif page == "Project Explorer":
         proj_row = df_projects[df_projects[p_name_col] == selected_proj]
         bom = proj_row.melt(id_vars=[p_name_col], value_vars=comp_cols, value_name="MfgNo").dropna()
         
-        # KEY FIX: Ensure all keys are strings, uppercase, and stripped of decimals
-        # This matches the logic in load_data_v9
+        # KEY FIX: Pre-process keys identically to load_data_v10 logic
         bom["MfgNo"] = bom["MfgNo"].astype(str).str.strip().str.upper()
         bom["MfgNo"] = bom["MfgNo"].str.replace(r'\.0$', '', regex=True)
         
-        # Filter junk after cleaning
+        # Filter junk
         bom = bom[bom["MfgNo"].str.len() > 1]
-        bom = bom[~bom["MfgNo"].isin(["-", "UNKNOWN", "NAN", "NONE"])]
+        bom = bom[~bom["MfgNo"].isin(["-", "UNKNOWN", "NAN", "NONE", "NAT", "0"])]
         
         c_mfg_no = get_col(df_components, ["MfgNo", "Mfg No", "PartNo", "Part Number"])
         
         if c_mfg_no:
-            # Main inventory is already cleaned/uppercased by load_data_v9
+            # We already cleaned df_components in load_data_v10
+            # Perform the merge
             df_bom = pd.merge(bom, df_components, left_on="MfgNo", right_on=c_mfg_no, how="left")
             
-            # FILL REMAINING GAPS WITH DASH (Clean Look)
+            # FINAL SWEEP: Replace any lingering NaNs from the merge with "-"
             df_bom = df_bom.fillna("-")
             
             total_parts = len(df_bom)
@@ -433,4 +477,3 @@ elif page == "Project Explorer":
         else:
             st.error("Could not link Project Data to Inventory. 'MfgNo' column missing in Inventory.")
     else: st.info("👆 Please select a project above to see its components.")
-
