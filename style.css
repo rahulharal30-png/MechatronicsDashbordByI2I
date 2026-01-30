@@ -60,14 +60,12 @@ header,
 .card-container {
     background-color: #ffffff;
     border-radius: 12px;
-    /* Slightly less round to save space corner-wise */
     padding: 16px;
-    /* Reduced from 24px */
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-    /* Very soft diffuse shadow */
     border: 1px solid #f1f5f9;
     margin-bottom: 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible !important;
 }
 
 .card-container:hover {
@@ -76,16 +74,13 @@ header,
     border-color: #e2e8f0;
 }
 
-/* 4. HEADERS WITHIN CARDS (Gradient Pip) */
+/* 4. HEADERS WITHIN CARDS (Simple Pip) */
 .chart-title {
     font-family: 'Outfit', sans-serif;
     font-size: 15px;
-    /* Slightly smaller */
     font-weight: 600;
     color: #475569;
-    /* Slate-600 */
     margin-bottom: 12px;
-    /* Much reduced from 24px to bring content up */
     display: flex;
     align-items: center;
 }
@@ -96,7 +91,6 @@ header,
     width: 6px;
     height: 6px;
     background: linear-gradient(135deg, #0d9488 0%, #3b82f6 100%);
-    /* Teal to Blue Gradient */
     margin-right: 8px;
     border-radius: 50%;
 }
@@ -106,15 +100,12 @@ header,
     background: #ffffff;
     border-radius: 12px;
     padding: 16px;
-    /* Reduced padding */
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid #f1f5f9;
     height: 100px;
-    /* Reduced from 140px */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Center vertically since height is small */
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
@@ -139,7 +130,6 @@ header,
 .kpi-label {
     font-size: 13px;
     color: #64748b;
-    /* Slate-500 */
     font-weight: 500;
     font-family: 'Outfit', sans-serif;
     text-transform: uppercase;
@@ -149,7 +139,6 @@ header,
 
 .kpi-value {
     font-size: 32px;
-    /* Adjusted from 42px for balance */
     font-weight: 700;
     background: linear-gradient(to right, #0f172a, #334155);
     -webkit-background-clip: text;
@@ -297,4 +286,184 @@ div[data-baseweb="input"]>div:focus-within {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+/* ============================================ */
+/* 11. NAVIGATION RADIO BUTTONS AS PILLS       */
+/* Transforms radio buttons into sleek nav tabs */
+/* ============================================ */
+
+/* Hide the actual radio circle indicators */
+.stRadio>div[role="radiogroup"]>label>div:first-child {
+    display: none !important;
+}
+
+/* Style radio labels as navigation pills */
+.stRadio>div[role="radiogroup"] {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+.stRadio>div[role="radiogroup"]>label {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+    margin: 0 !important;
+}
+
+/* Hover state */
+.stRadio>div[role="radiogroup"]>label:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Selected/Active state */
+.stRadio>div[role="radiogroup"]>label[data-checked="true"],
+.stRadio>div[role="radiogroup"]>label:has(input:checked) {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+    border-color: #0d9488 !important;
+}
+
+/* Target the text inside labels */
+.stRadio>div[role="radiogroup"]>label p,
+.stRadio>div[role="radiogroup"]>label span,
+.stRadio>div[role="radiogroup"]>label div {
+    color: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ============================================ */
+/* 11. DARK MODE OVERRIDE FIX                  */
+/* Forces light mode appearance regardless of  */
+/* user's system dark mode preference          */
+/* ============================================ */
+
+/* Force light background on the entire app */
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+.main .block-container {
+    background-color: #f8fafc !important;
+}
+
+/* Radio buttons - force visibility */
+.stRadio>label,
+.stRadio [data-testid="stMarkdownContainer"] p,
+[data-testid="stRadio"] label,
+[data-testid="stRadio"]>div>label {
+    color: #0f172a !important;
+    background-color: transparent !important;
+}
+
+.stRadio>div[role="radiogroup"]>label,
+.stRadio>div>div>label {
+    color: #0f172a !important;
+}
+
+.stRadio>div[role="radiogroup"]>label>div:first-child {
+    background-color: #ffffff !important;
+}
+
+/* All text inputs and their placeholders */
+input,
+textarea,
+select {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Markdown text in main area */
+.stMarkdown,
+.stMarkdown p,
+[data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span {
+    color: #0f172a !important;
+}
+
+/* Expander styling */
+[data-testid="stExpander"],
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary span,
+.streamlit-expanderHeader {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+}
+
+[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p {
+    color: #475569 !important;
+}
+
+/* Labels for all form elements */
+.stSelectbox label,
+.stMultiSelect label,
+.stTextInput label,
+.stNumberInput label,
+.stDateInput label,
+.stTimeInput label,
+.stTextArea label,
+.stCheckbox label,
+.stSlider label {
+    color: #0f172a !important;
+}
+
+/* Selectbox and multiselect text */
+[data-baseweb="select"] span,
+[data-baseweb="select"] input {
+    color: #0f172a !important;
+}
+
+/* Legends and axis labels for charts */
+.js-plotly-plot .legendtext,
+.js-plotly-plot .xtick text,
+.js-plotly-plot .ytick text,
+.js-plotly-plot .gtitle {
+    fill: #0f172a !important;
+}
+
+/* Metric components */
+[data-testid="stMetric"],
+[data-testid="stMetricLabel"],
+[data-testid="stMetricValue"] {
+    color: #0f172a !important;
+}
+
+[data-testid="stMetricLabel"]>div {
+    color: #64748b !important;
+}
+
+/* Tab labels */
+.stTabs [data-baseweb="tab-list"] button,
+.stTabs [data-baseweb="tab-list"] button div,
+.stTabs [data-baseweb="tab-list"] button p {
+    color: #0f172a !important;
+}
+
+.stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+    color: #0d9488 !important;
+}
+
+/* Column headers and general text */
+.element-container,
+.stText,
+div[data-testid="column"] {
+    color: #0f172a !important;
 }
