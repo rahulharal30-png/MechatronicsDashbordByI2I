@@ -1,56 +1,91 @@
-/* assets/style.css — MODERN ENTERPRISE THEME v3 */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* assets/style.css — FRESH TEAL MODERN v4 */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 /* 1. GLOBAL CANVAS & TYPOGRAPHY */
 .stApp {
-    background-color: #f3f4f6; /* Softer, cooler gray (Tailwind Slate-100) */
-    font-family: 'Inter', 'Segoe UI', sans-serif; /* Modern, clean font stack */
+    background-color: #f8fafc;
+    /* Slate-50: Very bright, clean gray */
+    font-family: 'Inter', sans-serif;
 }
 
-h1, h2, h3 {
-    color: #111827; /* Near black for headings */
-    font-weight: 700;
-    letter-spacing: -0.025em;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Outfit', sans-serif;
+    /* Friendly, modern heading font */
+    color: #0f172a;
+    /* Slate-900 */
+    font-weight: 600;
 }
 
 /* 2. REMOVE WHITESPACE & PADDING FIXES */
 .block-container {
-    padding-top: 1.5rem !important;
+    padding-top: 2rem !important;
     padding-bottom: 3rem !important;
-    max-width: 100% !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
+    max-width: 95% !important;
 }
 
 /* Hide Default Streamlit Elements */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
+/* HIDE STREAMLIT CHROME to simulate a real SaaS Product */
+header,
+[data-testid="stHeader"] {
+    display: none !important;
+}
 
-/* 3. CONTENT CARDS (The "Tile" Look) */
+[data-testid="stSidebar"] {
+    display: none !important;
+}
+
+[data-testid="stToolbar"] {
+    visibility: hidden !important;
+    display: none !important;
+}
+
+[data-testid="stDecoration"] {
+    visibility: hidden !important;
+    display: none !important;
+}
+
+/* Reclaim space */
+.block-container {
+    padding-top: 1rem !important;
+    max-width: 98% !important;
+    /* Full width */
+}
+
+/* 3. CONTENT CARDS (Glassy & Fresh) */
 .card-container {
     background-color: #ffffff;
-    border-radius: 10px; /* Slightly rounder */
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid #e5e7eb;
-    margin-bottom: 24px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    /* Slightly less round to save space corner-wise */
+    padding: 16px;
+    /* Reduced from 24px */
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    /* Very soft diffuse shadow */
+    border: 1px solid #f1f5f9;
+    margin-bottom: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-container:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 12px 16px -4px rgba(0, 0, 0, 0.05);
+    border-color: #e2e8f0;
 }
 
-/* 4. HEADERS WITHIN CARDS */
+/* 4. HEADERS WITHIN CARDS (Gradient Pip) */
 .chart-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #4b5563;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    /* Slightly smaller */
+    font-weight: 600;
+    color: #475569;
+    /* Slate-600 */
+    margin-bottom: 12px;
+    /* Much reduced from 24px to bring content up */
     display: flex;
     align-items: center;
 }
@@ -58,141 +93,208 @@ header {visibility: hidden;}
 .chart-title::before {
     content: '';
     display: inline-block;
-    width: 4px;
-    height: 18px;
-    background-color: #3b82f6; /* Primary Blue */
-    margin-right: 10px;
-    border-radius: 2px;
+    width: 6px;
+    height: 6px;
+    background: linear-gradient(135deg, #0d9488 0%, #3b82f6 100%);
+    /* Teal to Blue Gradient */
+    margin-right: 8px;
+    border-radius: 50%;
 }
 
-/* 5. HERO KPI CARDS */
+/* 5. HERO KPI CARDS (Modern Blocks) */
 .kpi-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 24px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    border-left: 5px solid #3b82f6;
-    height: 120px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    /* Reduced padding */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    height: 100px;
+    /* Reduced from 140px */
     display: flex;
     flex-direction: column;
     justify-content: center;
+    /* Center vertically since height is small */
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 50%;
 }
 
 .kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border-left-width: 8px; /* Thicker accent on hover */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e1;
 }
 
 .kpi-label {
     font-size: 13px;
-    color: #6b7280;
-    font-weight: 600;
-    margin-bottom: 8px;
+    color: #64748b;
+    /* Slate-500 */
+    font-weight: 500;
+    font-family: 'Outfit', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-bottom: 4px;
 }
 
 .kpi-value {
-    font-size: 36px;
-    font-weight: 800;
-    color: #111827;
-    line-height: 1;
-    font-feature-settings: "tnum"; /* Tabular numbers alignment */
+    font-size: 32px;
+    /* Adjusted from 42px for balance */
+    font-weight: 700;
+    background: linear-gradient(to right, #0f172a, #334155);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 /* 6. SIDEBAR STYLING */
+/* 6. SIDEBAR STYLING (Dark SaaS Mode) */
 [data-testid="stSidebar"] {
-    background-color: #ffffff;
-    border-right: 1px solid #e5e7eb;
+    background-color: #0f172a;
+    /* Slate 900 - Dark Sidebar */
+    border-right: 1px solid #1e293b;
 }
 
-/* 7. CUSTOM BUTTONS */
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #f8fafc !important;
+    /* White text for headers */
+}
+
+[data-testid="stSidebar"] label {
+    color: #cbd5e1 !important;
+    /* Slate 300 for labels */
+    font-weight: 500;
+}
+
+[data-testid="stSidebar"] .stRadio label {
+    color: #e2e8f0 !important;
+}
+
+[data-testid="stSidebar"] span {
+    color: #cbd5e1;
+}
+
+/* 7. CUSTOM BUTTONS (Gradient) */
 button[kind="primary"] {
-    background-color: #2563eb !important;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
     border: none;
     border-radius: 8px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    /* Classic SaaS radius */
+    font-weight: 500;
+    letter-spacing: 0.01em;
     padding: 0.5rem 1rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2);
+    transition: all 0.2s;
+    color: white !important;
 }
 
 button[kind="primary"]:hover {
-    background-color: #1d4ed8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px -1px rgba(13, 148, 136, 0.3);
+}
+
+button[kind="secondary"] {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 /* 8. DATAFRAME & TABLE FIXES */
 [data-testid="stDataFrame"] {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
+    /* Tighter radius */
     overflow: hidden;
+    background: white;
 }
 
 [data-testid="stDataFrame"] th {
+    font-family: 'Inter', sans-serif;
     font-weight: 600 !important;
-    color: #374151 !important;
-    background-color: #f3f4f6 !important;
-    border-bottom: 2px solid #e5e7eb !important;
+    color: #475569 !important;
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    font-size: 13px !important;
+    padding: 12px !important;
 }
 
-/* 9. CUSTOM WIDGET STYLING (Inputs, Selects) */
-div[data-baseweb="select"] > div, 
-div[data-baseweb="input"] > div {
+[data-testid="stDataFrame"] td {
+    font-size: 13px !important;
+    color: #334155 !important;
+}
+
+/* 9. CUSTOM WIDGET STYLING */
+/* Inputs need to adapt context. Main area = Light, Sidebar = Dark */
+
+/* Default (Light Mode - Main Area) */
+div[data-baseweb="select"]>div,
+div[data-baseweb="input"]>div {
     background-color: #ffffff;
-    border-color: #d1d5db;
-    border-radius: 6px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-color: #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 
-div[data-baseweb="select"]:hover > div, 
-div[data-baseweb="input"]:hover > div {
-    border-color: #3b82f6;
+/* Sidebar Specific Inputs (Dark Mode overrides) */
+[data-testid="stSidebar"] div[data-baseweb="select"]>div,
+[data-testid="stSidebar"] div[data-baseweb="input"]>div {
+    background-color: #1e293b !important;
+    /* Slate 800 */
+    border-color: #334155 !important;
+    color: white !important;
 }
 
-div[data-baseweb="select"] > div:focus-within, 
-div[data-baseweb="input"] > div:focus-within {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* Blue glow ring */
+[data-testid="stSidebar"] div[data-baseweb="input"] input {
+    color: white !important;
 }
 
-/* 10. SCROLLBAR (Webkit) */
+[data-testid="stSidebar"] div[data-baseweb="select"] span {
+    color: white !important;
+}
+
+/* Hover States */
+div[data-baseweb="select"]:hover>div,
+div[data-baseweb="input"]:hover>div {
+    border-color: #0d9488;
+}
+
+div[data-baseweb="select"]>div:focus-within,
+div[data-baseweb="input"]>div:focus-within {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* 10. SCROLLBAR */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; 
+    background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-    background: #c1c1c1; 
-    border-radius: 4px;
+    background: #cbd5e1;
+    border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8; 
+    background: #94a3b8;
 }
-
-/* 11. ENTRANCE ANIMATIONS */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate3d(0, 10px, 0);
-    }
-    to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-.card-container, .kpi-card {
-    animation-name: fadeInUp;
-    animation-duration: 0.5s;
-    animation-fill-mode: both;
-}
-
-/* Stagger animations slightly */
-.card-container:nth-child(1) { animation-delay: 0.05s; }
-.card-container:nth-child(2) { animation-delay: 0.1s; }
-.card-container:nth-child(3) { animation-delay: 0.15s; }
