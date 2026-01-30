@@ -477,3 +477,4 @@ elif page == "Project Explorer":
         else:
             st.error("Could not link Project Data to Inventory. 'MfgNo' column missing in Inventory.")
     else: st.info("👆 Please select a project above to see its components.")
+
