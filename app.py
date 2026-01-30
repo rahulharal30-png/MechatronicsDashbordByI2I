@@ -15,12 +15,12 @@ st.set_page_config(
     page_title="Mechatronics BI", 
     page_icon="📊", 
     layout="wide",
-    initial_sidebar_state="expanded" 
+    initial_sidebar_state="collapsed" # Force collapse since we hide it
 )
 
 # 2. LOAD CSS
 def load_css():
-    css_path = Path(__file__).parent /"style.css"
+    css_path = Path(__file__).parent / "style.css"
     if css_path.exists():
         st.markdown(f"<style>{css_path.read_text()}</style>", unsafe_allow_html=True)
     else:
@@ -32,53 +32,124 @@ load_css()
 def theme_plotly(fig, height=300):
     fig.update_layout(
         font_family="Inter, Segoe UI, sans-serif",
-        font_color="#4b5563",
-        title_font_size=14,
-        title_font_family="Inter, Segoe UI, sans-serif",
-        title_font_color="#111827",
+        font_color="#64748b",
+        title=None, # Explicitly remove title to prevent "undefined" artifacts
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(t=40, b=10, l=10, r=10),
+        margin=dict(t=0, b=10, l=0, r=0), # Remove top margin since we use HTML headers
         height=height,
         hoverlabel=dict(bgcolor="white", font_size=12, font_family="Inter, sans-serif")
     )
-    fig.update_xaxes(showgrid=False, linecolor="#e5e7eb", automargin=True)
-    fig.update_yaxes(showgrid=True, gridcolor="#f3f4f6", automargin=True)
+    fig.update_xaxes(showgrid=False, linecolor="#cbd5e1", automargin=True)
+    fig.update_yaxes(showgrid=True, gridcolor="#f1f5f9", automargin=True)
     return fig
 
 # ------------------------------------------------------------
-# 3. NAVIGATION ( COMPACT & ATTRACTIVE HEADER )
+# 3. NAVIGATION (TOP APP BAR ONLY)
 # ------------------------------------------------------------
-# A. SIDEBAR NAV (Standard)
-st.sidebar.title("📦 Mechatronics")
-if st.sidebar.button("🔥 Reset", type="primary"):
-    st.cache_data.clear()
-    st.rerun()
-st.sidebar.markdown("---")
-page_side = st.sidebar.radio("Navigate (Sidebar)", ["Inventory Overview", "Delivery Tracking", "Project Explorer"], key="nav_side")
 
 # B. MAIN HEADER NAV (Single Row, Stylish)
-# Use a container to group the header elements cleanly
 with st.container():
-    # Columns: Title (Left), Nav (Center-Right), Actions (Right)
-    c1, c2, c3 = st.columns([2, 3, 1], gap="small")
+    # -----------------------------------------------------------------------------
+    # CUSTOM APP BAR
+    # -----------------------------------------------------------------------------
+    st.markdown("""
+    <style>
+    /* Fixed App Bar */
+    .app-bar {
+        background: white;
+        padding: 12px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: -2rem -6rem 0rem -6rem !important; /* Zero bottom margin to connect with toolbar */
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
     
-    with c1:
-        # Title and Sidebar Toggle in one visual block
-        st.subheader("📊 Mechatronics BI")
-        # Optional: A tiny caption or breadcrumb
-        # st.caption(f"Last updated: {datetime.datetime.now().strftime('%H:%M')}")
+    /* Toolbar Area (Sub-header) */
+    .toolbar-container {
+        background: white;
+        padding: 8px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin: 0rem -6rem 1rem -6rem !important; 
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .app-bar-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        font-size: 18px;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .app-bar-icon {
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0fdf4;
+        color: #16a34a;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+    .app-bar-badge {
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 99px;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    </style>
+    <!-- 1. The Top Bar -->
+    <div class="app-bar">
+        <div class="app-bar-title">
+            <div class="app-bar-icon">📊</div>
+            <span>Mechatronics BI</span>
+            <span class="app-bar-badge">v6.0 Pro</span>
+        </div>
+    </div>
+    
+    <!-- 2. The Toolbar Background (Visual Only, Streamlit widgets sit on top) -->
+    <div class="toolbar-container">
+        <!-- We leave this empty or use it for static labels, 
+             but we rely on Streamlit vertical stack to place widgets here -->
+    </div>
+    """, unsafe_allow_html=True)
 
-    with c2:
-        # Navigation in the middle, using "pills" style if available or horizontal radio
-        # Using a selectbox can sometimes be cleaner for mobile, but radio horizontal is good for desktop
+    # -------------------------------------------------------------------------
+    # TOOLBAR CONTROLS (Floating in the toolbar area)
+    # -------------------------------------------------------------------------
+    # We use a container to inject negative margin to pull this UP into the toolbar-container visually
+    
+    # c_toolbar = st.container()
+    # with c_toolbar:
+    
+    # We use columns but with tighter ratios
+    c_nav, c_spacer, c_refresh = st.columns([4, 4, 1], gap="small")
+    
+    with c_nav:
+        # Navigation pills
         page_main = st.radio("Go to:", ["Inventory Overview", "Delivery Tracking", "Project Explorer"], 
-                             horizontal=True, label_visibility="collapsed", key="nav_main")
-
-    with c3:
-             if st.button("↻", help="Reload Data"):
-                 st.cache_data.clear()
-                 st.rerun()
+                                horizontal=True, label_visibility="collapsed", key="nav_main")
+    
+    with c_refresh:
+        # Aligned right
+        if st.button("↻ Update", help="Reload Data", type="secondary"):
+            st.cache_data.clear()
+            st.rerun()
+            
+    # Add a little divider between toolbar and content
+    st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
 
 # LOGIC: Sync Main Nav
 page = page_main 
@@ -322,14 +393,12 @@ elif page == "Delivery Tracking":
         st.stop()
         
     st.markdown("## 🚚 Delivery Tracking")
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
     f1, f2 = st.columns(2)
     with f1:
         all_sets = sorted(list(df_sets[s_set].unique()), key=natural_sort_key)
         selected_sets = st.multiselect("Select Set(s)", all_sets, placeholder="Choose specific sets (e.g. Set 1)")
     with f2:
         search_del = st.text_input("Text Search", placeholder="Search Mfg No, Name, or Status...", label_visibility="visible")
-    st.markdown('</div>', unsafe_allow_html=True)
 
     df_view = df_sets.copy()
     is_filtered = False
@@ -395,10 +464,8 @@ elif page == "Project Explorer":
     p_name_col = df_projects.columns[0]
     comp_cols = [c for c in df_projects.columns if "Component" in c]
 
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
     all_projects = sorted(df_projects[p_name_col].astype(str).unique())
     selected_proj = st.selectbox("Select a Project to View Bill of Materials (BOM)", all_projects, index=None, placeholder="Choose a Project...")
-    st.markdown('</div>', unsafe_allow_html=True)
 
     if selected_proj:
         proj_row = df_projects[df_projects[p_name_col] == selected_proj]
@@ -477,4 +544,3 @@ elif page == "Project Explorer":
         else:
             st.error("Could not link Project Data to Inventory. 'MfgNo' column missing in Inventory.")
     else: st.info("👆 Please select a project above to see its components.")
-
